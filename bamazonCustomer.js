@@ -59,7 +59,7 @@ function prompt4Item(inventory) {
                 prompt4Quantity(product);
             }
             else {
-                console.log("\nSorry. Don't carry that item."); //display do not carry error if # not found 
+                console.log("We don't carry that."); //display do not carry error if # not found 
                 displayItems();
             }
         });
@@ -90,13 +90,25 @@ function prompt4Quantity(product) {
         });
 }
 
-function buy(product, quantity) {
+function buy(product, quantity, price) {
+
+    connection.query(
+        "SELECT stock_quantity,price FROM products WHERE ?",
+        [quantity, product.price],
+        function (err, res) {
+            console.log(quantity);
+            let cost = quantity * product.price;
+            console.log("That'll be $" + cost);
+        }
+    )
     connection.query(
         "UPDATE products SET stock_quantity = stock_quantity - ? WHERE item_id = ?",
         [quantity, product.item_id],
-        function (err, res) {
-            // Let the user know the purchase was successful, re-run loadProducts
-            console.log("You just bought " + quantity + " " + product.product_name + "'s!");
+        function (err, res) { //confirm success & display total cost
+
+            console.log("You just bought " + quantity + " " + product.product_name);
+            console.log("");
+            
             displayItems(); // show table with new inv amounts.
         }
     );
